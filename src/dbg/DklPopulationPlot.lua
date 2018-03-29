@@ -14,8 +14,9 @@ DklBaseGraphics = DklBaseGraphics or {}
 require "dbg/DklAxis"
 require "dkl/DklBulletGraph"
 
-function DklBaseGraphics:plot(x,y,args)
+function DklBaseGraphics:populationplot(x,y,args)
 	args = args or {}
+	
 	local xlim = xlim or range(x)
 	local ylim = ylim or range(y)
 	self:plot_new()
@@ -27,13 +28,13 @@ function DklBaseGraphics:plot(x,y,args)
 	local type = args.type or "p"
 
 	if (type=="p" or type=="o" or type=="b") then
-		self:points(x,y,args)
+		self:pointsP(x,y,args)
 	elseif (type=="l" or type=="o" or type=="b") then
-		self:lines(x,y,args)
+		self:linesP(x,y,args)
 	end
 	if (axes) then
-		self:axis(1,args)
-		self:axis(2,args)
+		--self:axis(1,args)
+		--self:axis(2,args)
 		self:box({which="plot",bty=bty})
 	end
 	if (ann) then
@@ -41,7 +42,7 @@ function DklBaseGraphics:plot(x,y,args)
 	end
 end
 
-function DklBaseGraphics:points(x,y,args)
+function DklBaseGraphics:pointsP(x,y,args)
 	args = args or {}
 	
 	local pch = args.pch or self.plt.pch
@@ -87,8 +88,14 @@ function DklBaseGraphics:points(x,y,args)
 	popMatrix()
 end
 
-function DklBaseGraphics:lines(x,y,args)
+function DklBaseGraphics:linesP(x,y,args)
+
 	args = args or {}
+	
+	local n = #x
+	local m = #y
+	local w = math.floor(self.dev.size[2]/2)
+	local gap = (w/m)*self.dev.size[1]
 	
 	local col = args.col or self.plt.col
 	local _col = type(col) == "table" and col[1] or col
@@ -105,9 +112,28 @@ function DklBaseGraphics:lines(x,y,args)
 	
 	beginShape()
 		
-	for i=1,#x do
-		vertex(x[i]*self.plt.xscl,-y[i]*self.plt.yscl)
-
+	rectMode(CORNER)
+	dataX = rangeList(0.5,#x-1)
+	dataY2 = rangeList(0.5,#x-1)
+	ages = {'0-4', '5-9', '10-14', '15-19', '20-24', '25-29', '30-34', 
+	'35-39', '40-44', '45-49', '50-54', '55-59', '60-64', '65-69', 
+	'70-74', '75-79', '80-84', '85-89', '90+'}
+	
+	for i=1,n do
+		stroke(0)
+		fill(255,122,166)
+		result = rect(self.plt.xscl+self.dev.size[2]/4,-(dataX[i]-dataX[i]/1.4)*(self.plt.yscl+self.plt.yscl/3), y[i]*20,10)
+		fill(0)
+		text(ages[i],self.plt.xscl-self.dev.size[2]/8, -(-0.1+dataX[i]-dataX[i]/1.4)*(self.plt.yscl+self.plt.yscl/3))
+		--rect(self.dev.size[1]/30,-self.dev.size[2], x[i]*self.plt.xscl,(math.floor(self.dev.size[2]/2)))	
+		pushMatrix()
+		scale(-1,1)
+		fill(50,50,203)
+		--result2 = rect(self.plt.xscl,-self.dev.size[2]/20-(x[i])*self.plt.yscl-gap/2,x[i]*self.plt.xscl,gap)
+		result = rect(-self.plt.xscl-self.dev.size[2]/4,-(dataY2[i]-dataY2[i]/1.4)*(self.plt.yscl+self.plt.yscl/3),x[i]*20,10)
+		fill(255,122,166)
+		popMatrix()
+	
 	end
 	endShape()
 	

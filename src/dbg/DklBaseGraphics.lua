@@ -11,6 +11,8 @@
 
 require "dbg/DklUtilities"
 require "dbg/DklPlot"
+require "dbg/DklBulletPlot"
+require "dbg/DklPopulationPlot"
 
 DklBaseGraphics = DklBaseGraphics or {}
 

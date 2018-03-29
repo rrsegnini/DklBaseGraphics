@@ -14,10 +14,10 @@ DklBaseGraphics = DklBaseGraphics or {}
 require "dbg/DklAxis"
 require "dkl/DklBulletGraph"
 
-function DklBaseGraphics:plot(x,y,args)
+function DklBaseGraphics:bulletplot(x,y,args)
 	args = args or {}
 	local xlim = xlim or range(x)
-	local ylim = ylim or range(y)
+	local ylim = ylim or range(x)
 	self:plot_new()
 	self:plot_window(xlim,ylim,args)
 	
@@ -27,13 +27,13 @@ function DklBaseGraphics:plot(x,y,args)
 	local type = args.type or "p"
 
 	if (type=="p" or type=="o" or type=="b") then
-		self:points(x,y,args)
+		self:pointsB(x,y,args)
 	elseif (type=="l" or type=="o" or type=="b") then
-		self:lines(x,y,args)
+		self:linesB(x,y,args)
 	end
 	if (axes) then
-		self:axis(1,args)
-		self:axis(2,args)
+		--self:axis(1,args)
+		--self:axis(2,args)
 		self:box({which="plot",bty=bty})
 	end
 	if (ann) then
@@ -41,7 +41,7 @@ function DklBaseGraphics:plot(x,y,args)
 	end
 end
 
-function DklBaseGraphics:points(x,y,args)
+function DklBaseGraphics:pointsB(x,y,args)
 	args = args or {}
 	
 	local pch = args.pch or self.plt.pch
@@ -87,7 +87,7 @@ function DklBaseGraphics:points(x,y,args)
 	popMatrix()
 end
 
-function DklBaseGraphics:lines(x,y,args)
+function DklBaseGraphics:linesB(x,y,args)
 	args = args or {}
 	
 	local col = args.col or self.plt.col
@@ -104,11 +104,32 @@ function DklBaseGraphics:lines(x,y,args)
 	translate(-self.plt.usr[1]*self.plt.xscl,self.plt.usr[3]*self.plt.yscl)
 	
 	beginShape()
-		
-	for i=1,#x do
-		vertex(x[i]*self.plt.xscl,-y[i]*self.plt.yscl)
 
-	end
+	fill(0)
+
+		beginShape()
+		fill(255,255,255)
+
+
+		cont = 100
+		for i=table.getn(x), 1, -1 do
+			fill(cont)
+			cont = cont + 30
+			noStroke()
+			rect(self.dev.size[1]/30,-self.dev.size[2], x[i]*self.plt.xscl,(math.floor(self.dev.size[2]/2)))
+		end
+		
+		fill(0)
+		rectMode(CENTER)
+		rect((self.dev.size[1]/30)+(y[1]*self.plt.xscl)/2, -(self.dev.size[2])+(math.floor(self.dev.size[2]/4)), (y[1]*self.plt.xscl)/1,(math.floor(self.dev.size[2]/16)))
+		
+		fill(255,0,0)
+
+		rectMode(CENTER)
+		rect(y[2]*self.plt.xscl,-(self.dev.size[2])+(math.floor(self.dev.size[2]/4)),self.dev.size[2]/80,self.dev.size[2]-(self.dev.size[2]/1.2))
+		fill(0)
+
+
 	endShape()
 	
 	popMatrix()
